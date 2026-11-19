@@ -20,7 +20,6 @@ jobs:
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
-        # 删掉了 version: 10，让它自动读取 package.json 里的版本
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -40,11 +39,9 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install --prefer-offline
 
-      # 使用原生命令编译，跳过 tauri-action 的强制签名验证
       - name: Build Tauri App (Windows)
         run: pnpm tauri build
 
-      # 无论上面是否报错（比如最后的 updater 签名报错），强行把安装包抓下来
       - name: Upload Windows Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,7 +62,6 @@ jobs:
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
-        # 同样删掉了 version: 10
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -85,7 +81,7 @@ jobs:
           java-version: '17'
 
       - name: setup Android SDK
-        uses: actions/setup-android@v3
+        uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
 
@@ -104,7 +100,6 @@ jobs:
       - name: Build Android APKs
         run: pnpm tauri android build --apk --split-per-abi
 
-      # 使用 **/*.apk 递归抓取所有架构的安装包
       - name: Upload Android Artifacts
         if: always()
         uses: actions/upload-artifact@v4
