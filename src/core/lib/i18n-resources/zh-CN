@@ -1,0 +1,141 @@
+{
+    "translation": {
+        "app": {
+            "title": "Theorem"
+        },
+        "sidebar": {
+            "library": "书库",
+            "shelves": "书架",
+            "bookmarks": "书签",
+            "annotations": "笔记",
+            "statistics": "统计",
+            "vocabulary": "生词本",
+            "feeds": "订阅源",
+            "settings": "设置"
+        },
+        "library": {
+            "empty": "暂无书籍。拖入文件或选择文件夹。",
+            "noMatch": "没有符合条件的文档",
+            "resetSearch": "重置搜索",
+            "import": "导入",
+            "scanFolder": "扫描文件夹",
+            "search": "搜索书籍...",
+            "sortBy": "排序方式",
+            "viewGrid": "网格视图",
+            "viewList": "列表视图",
+            "viewCompact": "紧凑视图"
+        },
+        "reader": {
+            "openBook": "打开书籍",
+            "readingProgress": "阅读进度",
+            "tableOfContents": "目录",
+            "search": "搜索",
+            "bookmarks": "书签",
+            "notes": "笔记",
+            "settings": "设置",
+            "readAloud": "朗读",
+            "previous": "上一页",
+            "next": "下一页",
+            "close": "关闭",
+            "back": "返回",
+            "noToc": "暂无目录",
+            "notFound": "未找到书籍",
+            "cbrUnsupported": "暂不支持 CBR 压缩包格式",
+            "syncedWithoutFile": "此书从其他设备同步而来，但文件尚未传输完成",
+            "loadError": "加载书籍失败",
+            "opening": "正在打开阅读器..."
+        },
+        "annotations": {
+            "title": "笔记与高亮",
+            "noAnnotations": "暂无笔记",
+            "highlight": "高亮",
+            "note": "笔记",
+            "bookmark": "书签",
+            "addNote": "添加笔记",
+            "editNote": "编辑笔记",
+            "delete": "删除",
+            "define": "查词",
+            "exportMarkdown": "导出为 Markdown"
+        },
+        "vocabulary": {
+            "title": "生词本",
+            "empty": "暂未保存生词",
+            "search": "搜索生词...",
+            "lookup": "查询",
+            "save": "保存",
+            "delete": "删除",
+            "pronunciation": "发音",
+            "definitions": "释义",
+            "noDefinitions": "未找到释义"
+        },
+        "settings": {
+            "title": "设置",
+            "general": "常规",
+            "reader": "阅读器",
+            "dictionary": "词典",
+            "integrations": "集成",
+            "storage": "存储",
+            "theme": "主题",
+            "themeLight": "浅色",
+            "themeDark": "深色",
+            "themeSystem": "跟随系统",
+            "language": "语言",
+            "font": "字体",
+            "fontSize": "字号",
+            "lineHeight": "行高",
+            "margin": "页边距",
+            "readingGoals": "阅读目标",
+            "dailyMinutes": "每日阅读时长（分钟）",
+            "yearlyBooks": "年度阅读本数",
+            "clearData": "清除所有数据",
+            "resetSettings": "重置设置"
+        },
+        "statistics": {
+            "title": "统计",
+            "totalTime": "总阅读时长",
+            "booksCompleted": "完成阅读的书籍",
+            "readingSpeed": "阅读速度",
+            "currentStreak": "当前连续阅读天数",
+            "longestStreak": "最长连续阅读天数",
+            "dailyGoal": "每日目标",
+            "yearlyGoal": "年度目标"
+        },
+        "feeds": {
+            "title": "订阅源",
+            "addFeed": "添加订阅源",
+            "allArticles": "所有文章",
+            "noFeeds": "暂无订阅源",
+            "noArticles": "暂无文章",
+            "deleteFeed": "删除订阅源",
+            "refresh": "刷新",
+            "feedUrl": "订阅源链接 (URL)"
+        },
+        "sync": {
+            "title": "设备同步",
+            "pairDevice": "配对设备",
+            "unpair": "取消配对",
+            "syncNow": "立即同步",
+            "noDevices": "无已配对设备",
+            "pairing": "使用另一台运行 Theorem 的设备扫描二维码"
+        },
+        "common": {
+            "cancel": "取消",
+            "confirm": "确认",
+            "delete": "删除",
+            "edit": "编辑",
+            "save": "保存",
+            "close": "关闭",
+            "back": "返回",
+            "loading": "加载中...",
+            "error": "出错了",
+            "retry": "重试",
+            "noResults": "无结果",
+            "done": "完成"
+        },
+        "error": {
+            "pageError": "此页面遇到错误",
+            "applicationError": "应用程序错误",
+            "reload": "重新加载页面"
+        }
+    }
+}
