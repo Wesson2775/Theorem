@@ -1,45 +1,61 @@
-name: Build App (No Signing)
+name: Build App (Windows & Android)
 
 on:
-  workflow_dispatch: # 允许你在网页上手动点击运行
+  workflow_dispatch: 
   push:
     tags:
-      - 'v*' # 推送任意 v 开头的标签也会触发
+      - 'v*' 
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
-
-    runs-on: ${{ matrix.platform }}
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        # 注意：这里删除了 version 字段，它会自动读取 package.json 里的 packageManager 字段
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: install frontend dependencies
+        run: pnpm install
+
+      - name: Build Tauri App (Windows)
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ''
+
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -50,19 +66,37 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
+      - name: setup Java
+        uses: actions/setup-java@v4
         with:
-          workspaces: './src-tauri -> target'
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: install frontend dependencies
         run: pnpm install
 
-      - name: Build Tauri App
-        uses: tauri-apps/tauri-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Initialize Android project
+        run: pnpm tauri android init --ci
+
+      # 关闭代码压缩，并移除必须签名的强制要求（这是打未签名测试包的关键）
+      - name: Disable Android release minification and signing
+        run: |
+          FILE="src-tauri/gen/android/app/build.gradle.kts"
+          sed -i '0,/isMinifyEnabled = true/s//isMinifyEnabled = false/' "$FILE"
+          sed -i 's/signingConfig = signingConfigs.getByName("release")//g' "$FILE"
+
+      - name: Build Android APKs
+        run: pnpm tauri android build --apk --split-per-abi
+
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          args: ${{ matrix.args }}
+          name: android-apks
+          # Tauri Android 构建完成后，apk 文件通常在这个目录下
+          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: warn
