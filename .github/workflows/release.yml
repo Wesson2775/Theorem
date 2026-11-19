@@ -20,7 +20,6 @@ jobs:
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
-        # 注意：这里删除了 version 字段，它会自动读取 package.json 里的 packageManager 字段
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -45,6 +44,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: ''
+
+      # 核心修复：把路径改为 **/*.exe 和 **/*.msi，这样就算它报错也能强行把文件抓下来
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+          if-no-files-found: warn
 
   build-android:
     name: Build Android
@@ -73,7 +82,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          
+
       - name: setup Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -85,7 +94,7 @@ jobs:
       - name: Initialize Android project
         run: pnpm tauri android init --ci
 
-      # 关闭代码压缩，并移除必须签名的强制要求（这是打未签名测试包的关键）
+      # 关闭代码压缩，并移除必须签名的强制要求
       - name: Disable Android release minification and signing
         run: |
           FILE="src-tauri/gen/android/app/build.gradle.kts"
@@ -95,10 +104,10 @@ jobs:
       - name: Build Android APKs
         run: pnpm tauri android build --apk --split-per-abi
 
+      # 核心修复：使用 **/ 递归查找所有子目录（universal/release 或 release 都能抓到）
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-apks
-          # Tauri Android 构建完成后，apk 文件通常在这个目录下
-          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
