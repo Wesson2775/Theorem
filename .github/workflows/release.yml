@@ -20,6 +20,8 @@ jobs:
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -34,19 +36,18 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+          cache-on-failure: true
 
       - name: install frontend dependencies
-        run: pnpm install
+        run: pnpm install --prefer-offline
 
+      # 使用原生命令编译，跳过 tauri-action 的强制签名验证
       - name: Build Tauri App (Windows)
-        uses: tauri-apps/tauri-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: ''
+        run: pnpm tauri build
 
-      # 核心修复：把路径改为 **/*.exe 和 **/*.msi，这样就算它报错也能强行把文件抓下来
+      # 无论上面是否报错（比如最后的 updater 签名报错），强行把安装包抓下来
       - name: Upload Windows Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: windows-installers
@@ -65,6 +66,8 @@ jobs:
 
       - name: setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -89,12 +92,11 @@ jobs:
           packages: 'platform-tools'
 
       - name: install frontend dependencies
-        run: pnpm install
+        run: pnpm install --prefer-offline
 
       - name: Initialize Android project
         run: pnpm tauri android init --ci
 
-      # 关闭代码压缩，并移除必须签名的强制要求
       - name: Disable Android release minification and signing
         run: |
           FILE="src-tauri/gen/android/app/build.gradle.kts"
@@ -104,8 +106,9 @@ jobs:
       - name: Build Android APKs
         run: pnpm tauri android build --apk --split-per-abi
 
-      # 核心修复：使用 **/ 递归查找所有子目录（universal/release 或 release 都能抓到）
+      # 使用 **/*.apk 递归抓取所有架构的安装包
       - name: Upload Android Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: android-apks
